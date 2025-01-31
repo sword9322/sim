@@ -1,32 +1,34 @@
-import { Menu, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import SearchBar from "@/components/SearchBar";
 
 interface TopBarProps {
   onMenuClick: () => void;
+  children?: React.ReactNode;
 }
 
-export const TopBar = ({ onMenuClick }: TopBarProps) => {
+export const TopBar = ({ onMenuClick, children }: TopBarProps) => {
+  const handleSearch = (query: string) => {
+    console.log("TopBar search:", query); // Debug log
+  };
+
   return (
-    <header className="h-16 border-b border-border bg-white/50 backdrop-blur-sm sticky top-0 z-30">
-      <div className="h-full flex items-center justify-between px-4">
+    <header className="sticky top-0 z-50 w-full border-b bg-gradient-to-r from-background to-accent/5 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="h-16 flex items-center justify-between px-6 py-4">
         <button
           onClick={onMenuClick}
           className="p-2 hover:bg-secondary rounded-md transition-colors"
         >
           <Menu size={20} />
         </button>
-        <div className="flex-1 max-w-xl mx-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-            <Input
-              placeholder="Search content..."
-              className="pl-10 bg-secondary border-none"
-            />
-          </div>
+        <div className="flex-1 max-w-xl mx-6">
+          <SearchBar 
+            onSearch={handleSearch}
+            placeholder="Search content..."
+          />
         </div>
-        <div className="flex items-center space-x-4">
-          {/* Add user profile/settings buttons here */}
-        </div>
+        {children}
       </div>
     </header>
   );

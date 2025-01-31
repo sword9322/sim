@@ -1,4 +1,4 @@
-import { Film, Plus } from "lucide-react";
+import { Film, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,16 +9,55 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+
+interface Video {
+  id: number;
+  title: string;
+  file_path: string;
+  created_at: string;
+  duration: number;
+}
 
 const Videos = () => {
   const [title, setTitle] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [videos, setVideos] = useState<Video[]>([]);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const fetchVideos = async () => {
+    try {
+      const response = await fetch('http://localhost:8888/backend/api/videos.php', {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        setVideos(data.data);
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch videos",
+        variant: "destructive",
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchVideos();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!file) {
@@ -30,27 +69,78 @@ const Videos = () => {
       return;
     }
     
-    // Create a FormData object to send the file
     const formData = new FormData();
     formData.append('title', title);
     formData.append('file', file);
     
-    // For now, we'll just show a success message
-    toast({
-      title: "Video added",
-      description: `Successfully added video: ${title}`,
-    });
-    
-    // Reset form
-    setTitle("");
-    setFile(null);
-    setIsOpen(false);
+    try {
+      const response = await fetch('http://localhost:8888/backend/api/videos.php', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+      
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        toast({
+          title: "Success",
+          description: "Video uploaded successfully",
+        });
+        
+        setTitle("");
+        setFile(null);
+        setIsOpen(false);
+        fetchVideos(); // Refresh the videos list after upload
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to upload video",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
     }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      const response = await fetch(`http://localhost:8888/backend/api/videos.php?id=${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        toast({
+          title: "Success",
+          description: "Video deleted successfully",
+        });
+        fetchVideos(); // Refresh the list
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete video",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const formatDuration = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
   return (
@@ -104,8 +194,41 @@ const Videos = () => {
           </DialogContent>
         </Dialog>
       </div>
-      <div className="bg-white rounded-lg border border-border p-6">
-        <p className="text-muted-foreground">No videos added yet. Click the "Add Video" button to get started.</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {videos.length > 0 ? (
+          videos.map((video) => (
+            <div key={video.id} className="bg-white rounded-lg border border-border p-4">
+              <div className="relative">
+                <video 
+                  controls 
+                  className="w-full h-48 object-cover rounded-md mb-4"
+                  src={`http://localhost:8888/backend/uploads/videos/${video.file_path.split('/').pop()}`}
+                >
+                  Your browser does not support the video tag.
+                </video>
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="absolute top-2 right-2"
+                  onClick={() => handleDelete(video.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+              <h3 className="font-semibold">{video.title}</h3>
+              <div className="flex justify-between items-center text-sm text-muted-foreground">
+                <span>{new Date(video.created_at).toLocaleDateString()}</span>
+                <span>{formatDuration(video.duration)}</span>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="col-span-full bg-white rounded-lg border border-border p-6">
+            <p className="text-muted-foreground">
+              No videos added yet. Click the "Add Video" button to get started.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

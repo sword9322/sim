@@ -1,4 +1,4 @@
-import { FileText, Plus } from "lucide-react";
+import { Download, Eye, FileText, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,16 +9,69 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
+interface Document {
+  id: number;
+  title: string;
+  file_path: string;
+  file_type: string;
+  created_at: string;
+}
 
 const Documents = () => {
   const [title, setTitle] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchDocuments();
+  }, []);
+
+  const fetchDocuments = async () => {
+    try {
+      const response = await fetch('http://localhost:8888/backend/api/documents.php', {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        setDocuments(data.data);
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch documents",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!file) {
@@ -30,28 +83,83 @@ const Documents = () => {
       return;
     }
     
-    // Here you would typically make an API call to your PHP backend
-    // Create a FormData object to send the file
     const formData = new FormData();
     formData.append('title', title);
     formData.append('file', file);
     
-    // For now, we'll just show a success message
-    toast({
-      title: "Document added",
-      description: `Successfully added document: ${title}`,
-    });
-    
-    // Reset form
-    setTitle("");
-    setFile(null);
-    setIsOpen(false);
+    try {
+      const response = await fetch('http://localhost:8888/backend/api/documents.php', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+      
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        toast({
+          title: "Success",
+          description: "Document uploaded successfully",
+        });
+        
+        fetchDocuments();
+        setTitle("");
+        setFile(null);
+        setIsOpen(false);
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to upload document",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+  const handleDelete = async (id: number) => {
+    try {
+      const response = await fetch(`http://localhost:8888/backend/api/documents.php?id=${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      
+      const data = await response.json();
+      
+      if (data.status === 'success') {
+        toast({
+          title: "Success",
+          description: "Document deleted successfully",
+        });
+        fetchDocuments(); // Refresh the list
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to delete document",
+        variant: "destructive",
+      });
     }
+  };
+
+  const handleDownload = async (id: number, title: string) => {
+    try {
+      window.open(`http://localhost:8888/backend/api/documents.php?download=${id}`, '_blank');
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to download document",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getPreviewUrl = (fileType: string) => {
+    const previewableTypes = ['pdf', 'jpg', 'jpeg', 'png', 'gif'];
+    return previewableTypes.includes(fileType.toLowerCase());
   };
 
   return (
@@ -88,15 +196,9 @@ const Documents = () => {
                 <Input
                   id="file"
                   type="file"
-                  onChange={handleFileChange}
+                  onChange={(e) => e.target.files && setFile(e.target.files[0])}
                   required
-                  accept=".pdf,.doc,.docx,.txt"
                 />
-                {file && (
-                  <p className="text-sm text-muted-foreground">
-                    Selected file: {file.name}
-                  </p>
-                )}
               </div>
               <div className="flex justify-end">
                 <Button type="submit">Upload Document</Button>
@@ -105,9 +207,85 @@ const Documents = () => {
           </DialogContent>
         </Dialog>
       </div>
-      <div className="bg-white rounded-lg border border-border p-6">
-        <p className="text-muted-foreground">No documents added yet. Click the "Add Document" button to get started.</p>
-      </div>
+
+      {isLoading ? (
+        <div className="flex justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      ) : documents.length > 0 ? (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {documents.map((doc) => (
+            <Card key={doc.id}>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <FileText size={20} className="text-muted-foreground" />
+                    <div>
+                      <h3 className="font-medium">{doc.title}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(doc.created_at).toLocaleDateString()}
+                      </p>
+                      <p className="text-xs text-muted-foreground uppercase">
+                        {doc.file_type}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDownload(doc.id, doc.title)}
+                      title="Download"
+                    >
+                      <Download size={16} />
+                    </Button>
+                    
+                    {getPreviewUrl(doc.file_type) && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => window.open(`http://localhost:8888/backend/uploads/documents/${doc.file_path}`, '_blank')}
+                        title="Preview"
+                      >
+                        <Eye size={16} />
+                      </Button>
+                    )}
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
+                          <Trash2 size={16} />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the document.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction 
+                            onClick={() => handleDelete(doc.id)}
+                            className="bg-red-500 hover:bg-red-600"
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg border border-border p-6">
+          <p className="text-muted-foreground">No documents added yet. Click the "Add Document" button to get started.</p>
+        </div>
+      )}
     </div>
   );
 };

@@ -5,7 +5,7 @@ const Index = () => {
   return (
     <div className="min-h-[calc(100vh-8rem)] flex flex-col items-center justify-center text-center px-4">
       <h1 className="text-4xl sm:text-5xl font-bold mb-6 animate-fade-up">
-        Welcome to MediaHub
+        Welcome to SIM
       </h1>
       <p className="text-xl text-muted-foreground mb-8 max-w-2xl animate-fade-up" style={{ animationDelay: "0.1s" }}>
         Your centralized platform for managing and accessing multimedia content.
