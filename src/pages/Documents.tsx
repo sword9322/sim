@@ -14,14 +14,28 @@ import { useToast } from "@/components/ui/use-toast";
 
 const Documents = () => {
   const [title, setTitle] = useState("");
-  const [url, setUrl] = useState("");
+  const [file, setFile] = useState<File | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!file) {
+      toast({
+        title: "Error",
+        description: "Please select a file to upload",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Here you would typically make an API call to your PHP backend
+    // Create a FormData object to send the file
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('file', file);
+    
     // For now, we'll just show a success message
     toast({
       title: "Document added",
@@ -30,8 +44,14 @@ const Documents = () => {
     
     // Reset form
     setTitle("");
-    setUrl("");
+    setFile(null);
     setIsOpen(false);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+    }
   };
 
   return (
@@ -64,18 +84,22 @@ const Documents = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="url">URL</Label>
+                <Label htmlFor="file">File</Label>
                 <Input
-                  id="url"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder="Enter document URL"
-                  type="url"
+                  id="file"
+                  type="file"
+                  onChange={handleFileChange}
                   required
+                  accept=".pdf,.doc,.docx,.txt"
                 />
+                {file && (
+                  <p className="text-sm text-muted-foreground">
+                    Selected file: {file.name}
+                  </p>
+                )}
               </div>
               <div className="flex justify-end">
-                <Button type="submit">Add Document</Button>
+                <Button type="submit">Upload Document</Button>
               </div>
             </form>
           </DialogContent>
