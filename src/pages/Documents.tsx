@@ -26,10 +26,10 @@ import {
 
 interface Document {
   id: number;
-  title: string;
-  file_path: string;
-  file_type: string;
-  created_at: string;
+  name: string;
+  type: string;
+  url: string;
+  created_at?: string;
 }
 
 const Documents = () => {
@@ -54,9 +54,10 @@ const Documents = () => {
         }
       });
       const data = await response.json();
+      console.log('Fetched documents:', data);
       
       if (data.status === 'success') {
-        setDocuments(data.data);
+        setDocuments(data.documents);
       } else {
         throw new Error(data.message);
       }
@@ -145,7 +146,7 @@ const Documents = () => {
     }
   };
 
-  const handleDownload = async (id: number, title: string) => {
+  const handleDownload = async (id: number, name: string) => {
     try {
       window.open(`http://localhost:8888/backend/api/documents.php?download=${id}`, '_blank');
     } catch (error) {
@@ -158,50 +159,58 @@ const Documents = () => {
   };
 
   const getPreviewUrl = (fileType: string) => {
+    if (!fileType) return false;
     const previewableTypes = ['pdf', 'jpg', 'jpeg', 'png', 'gif'];
-    return previewableTypes.includes(fileType.toLowerCase());
+    const extension = fileType.split('/').pop()?.toLowerCase() || fileType.toLowerCase();
+    return previewableTypes.includes(extension);
   };
 
   return (
-    <div className="animate-fade-up">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-6 min-h-screen animate-fade-up">
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <FileText size={24} />
-          <h1 className="text-2xl font-semibold">Documents</h1>
+          <FileText size={24} className="text-blue-600" />
+          <h1 className="text-3xl font-semibold text-gray-900">Documents</h1>
         </div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
               <Plus className="mr-2" size={16} />
               Add Document
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="bg-white rounded-lg p-6 shadow-lg">
             <DialogHeader>
-              <DialogTitle>Add New Document</DialogTitle>
+              <DialogTitle className="text-xl font-semibold text-gray-900">
+                Add New Document
+              </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4 mt-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
+                <Label htmlFor="title" className="text-gray-700">Title</Label>
                 <Input
                   id="title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Enter document title"
                   required
+                  className="shadow-sm border-gray-300 rounded-md"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="file">File</Label>
+                <Label htmlFor="file" className="text-gray-700">File</Label>
                 <Input
                   id="file"
                   type="file"
                   onChange={(e) => e.target.files && setFile(e.target.files[0])}
                   required
+                  className="shadow-sm border-gray-300 rounded-md"
                 />
               </div>
               <div className="flex justify-end">
-                <Button type="submit">Upload Document</Button>
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
+                  Upload Document
+                </Button>
               </div>
             </form>
           </DialogContent>
@@ -210,23 +219,23 @@ const Documents = () => {
 
       {isLoading ? (
         <div className="flex justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
-      ) : documents.length > 0 ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      ) : documents && documents.length > 0 ? (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {documents.map((doc) => (
-            <Card key={doc.id}>
+            <Card key={doc.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <FileText size={20} className="text-muted-foreground" />
+                  <div className="flex items-center gap-3">
+                    <FileText size={20} className="text-gray-600" />
                     <div>
-                      <h3 className="font-medium">{doc.title}</h3>
-                      <p className="text-sm text-muted-foreground">
+                      <h3 className="font-medium text-gray-900">{doc.name}</h3>
+                      <p className="text-sm text-gray-500">
                         {new Date(doc.created_at).toLocaleDateString()}
                       </p>
-                      <p className="text-xs text-muted-foreground uppercase">
-                        {doc.file_type}
+                      <p className="text-xs text-gray-500 uppercase">
+                        {doc.type}
                       </p>
                     </div>
                   </div>
@@ -234,33 +243,33 @@ const Documents = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => handleDownload(doc.id, doc.title)}
+                      onClick={() => handleDownload(doc.id, doc.name)}
                       title="Download"
+                      className="text-blue-600 hover:bg-blue-50"
                     >
                       <Download size={16} />
                     </Button>
-                    
-                    {getPreviewUrl(doc.file_type) && (
+                    {getPreviewUrl(doc.type) && (
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => window.open(`http://localhost:8888/backend/uploads/documents/${doc.file_path}`, '_blank')}
+                        onClick={() => window.open(doc.url, '_blank')}
                         title="Preview"
+                        className="text-blue-600 hover:bg-blue-50"
                       >
                         <Eye size={16} />
                       </Button>
                     )}
-
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
                           <Trash2 size={16} />
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent>
+                      <AlertDialogContent className="bg-white rounded-lg p-6 shadow-lg">
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
+                          <AlertDialogTitle className="text-lg font-semibold text-gray-900">Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription className="text-gray-600">
                             This action cannot be undone. This will permanently delete the document.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
@@ -268,7 +277,7 @@ const Documents = () => {
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction 
                             onClick={() => handleDelete(doc.id)}
-                            className="bg-red-500 hover:bg-red-600"
+                            className="bg-red-500 hover:bg-red-600 text-white"
                           >
                             Delete
                           </AlertDialogAction>
@@ -282,8 +291,8 @@ const Documents = () => {
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-lg border border-border p-6">
-          <p className="text-muted-foreground">No documents added yet. Click the "Add Document" button to get started.</p>
+        <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
+          <p className="text-gray-600">No documents added yet. Click the "Add Document" button to get started.</p>
         </div>
       )}
     </div>

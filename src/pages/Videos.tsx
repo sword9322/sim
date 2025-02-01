@@ -144,60 +144,66 @@ const Videos = () => {
   };
 
   return (
-    <div className="animate-fade-up">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-6 min-h-screen animate-fade-up">
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <Film size={24} />
-          <h1 className="text-2xl font-semibold">Videos</h1>
+          <Film size={24} className="text-blue-600" />
+          <h1 className="text-3xl font-semibold text-gray-900">Videos</h1>
         </div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
               <Plus className="mr-2" size={16} />
               Add Video
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="bg-white rounded-lg p-6 shadow-lg">
             <DialogHeader>
-              <DialogTitle>Add New Video</DialogTitle>
+              <DialogTitle className="text-xl font-semibold text-gray-900">Add New Video</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4 mt-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
+                <Label htmlFor="title" className="text-gray-700">Title</Label>
                 <Input
                   id="title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Enter video title"
                   required
+                  className="shadow-sm border-gray-300 rounded-md"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="file">File</Label>
+                <Label htmlFor="file" className="text-gray-700">File</Label>
                 <Input
                   id="file"
                   type="file"
                   onChange={handleFileChange}
                   required
                   accept="video/*,.mp4,.webm,.ogg"
+                  className="shadow-sm border-gray-300 rounded-md"
                 />
                 {file && (
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-gray-600">
                     Selected file: {file.name}
                   </p>
                 )}
               </div>
               <div className="flex justify-end">
-                <Button type="submit">Upload Video</Button>
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
+                  Upload Video
+                </Button>
               </div>
             </form>
           </DialogContent>
         </Dialog>
       </div>
+      
+      {/* Video Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {videos.length > 0 ? (
           videos.map((video) => (
-            <div key={video.id} className="bg-white rounded-lg border border-border p-4">
+            <div key={video.id} className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow duration-300">
               <div className="relative">
                 <video 
                   controls 
@@ -209,22 +215,22 @@ const Videos = () => {
                 <Button
                   variant="destructive"
                   size="icon"
-                  className="absolute top-2 right-2"
+                  className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1"
                   onClick={() => handleDelete(video.id)}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
-              <h3 className="font-semibold">{video.title}</h3>
-              <div className="flex justify-between items-center text-sm text-muted-foreground">
+              <h3 className="font-semibold text-gray-900">{video.title}</h3>
+              <div className="flex justify-between items-center text-sm text-gray-600">
                 <span>{new Date(video.created_at).toLocaleDateString()}</span>
                 <span>{formatDuration(video.duration)}</span>
               </div>
             </div>
           ))
         ) : (
-          <div className="col-span-full bg-white rounded-lg border border-border p-6">
-            <p className="text-muted-foreground">
+          <div className="col-span-full bg-white rounded-lg border border-gray-200 p-6 text-center">
+            <p className="text-gray-600">
               No videos added yet. Click the "Add Video" button to get started.
             </p>
           </div>

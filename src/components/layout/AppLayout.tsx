@@ -16,7 +16,7 @@ export const AppLayout = () => {
         <TopBar onMenuClick={() => setSidebarOpen(!sidebarOpen)}>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-600">
-              Welcome, {user?.email}
+              Welcome, {user?.name}
             </span>
             <Link 
               to="/profile"

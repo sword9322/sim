@@ -205,87 +205,88 @@ const Music = () => {
   };
 
   return (
-    <div className="animate-fade-up">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <MusicIcon size={24} />
-          <h1 className="text-2xl font-semibold">Music</h1>
+    <div className="p-6 min-h-screen animate-fade-up flex flex-col">
+      <div className="flex items-center gap-2">
+          <MusicIcon size={24} className="text-blue-600" />
+          <h1 className="text-3xl font-semibold text-gray-900">Music</h1>
         </div>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
-          <div className="relative flex-1 sm:flex-none">
-            <SearchBar 
-              onSearch={handleSearch}
-              placeholder="Search by title or artist..."
-            />
-          </div>
-          <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2" size={16} />
-                Add Music
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Add New Music</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="title">Title</Label>
-                  <Input
-                    id="title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Enter music title"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="artist">Artist</Label>
-                  <Input
-                    id="artist"
-                    value={artist}
-                    onChange={(e) => setArtist(e.target.value)}
-                    placeholder="Enter artist name"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="file">File</Label>
-                  <Input
-                    id="file"
-                    type="file"
-                    accept=".mp3,.wav,.ogg"
-                    onChange={(e) => e.target.files && setFile(e.target.files[0])}
-                    required
-                    className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-                  />
-                </div>
-                <div className="flex justify-end pt-4">
-                  <Button type="submit">Upload Music</Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-2">
+       
         </div>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+              <Plus className="mr-2" size={16} />
+              Add Music
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="bg-white rounded-lg p-6 shadow-lg">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-semibold text-gray-900">
+                Add New Music
+              </DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label htmlFor="title" className="text-gray-700">Title</Label>
+                <Input
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Enter music title"
+                  required
+                  className="shadow-sm border-gray-300 rounded-md"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="artist" className="text-gray-700">Artist</Label>
+                <Input
+                  id="artist"
+                  value={artist}
+                  onChange={(e) => setArtist(e.target.value)}
+                  placeholder="Enter artist name"
+                  required
+                  className="shadow-sm border-gray-300 rounded-md"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="file" className="text-gray-700">File</Label>
+                <Input
+                  id="file"
+                  type="file"
+                  accept=".mp3,.wav,.ogg"
+                  onChange={(e) => e.target.files && setFile(e.target.files[0])}
+                  required
+                  className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+                />
+              </div>
+              <div className="flex justify-end pt-4">
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
+                  Upload Music
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {isLoading ? (
         <div className="flex justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
       ) : paginatedMusic.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {paginatedMusic.map((music) => (
-              <Card key={music.id} id={`music-${music.id}`} className="transition-colors">
+              <Card key={music.id} id={`music-${music.id}`} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <MusicIcon size={20} className="text-muted-foreground flex-shrink-0" />
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <MusicIcon size={20} className="text-gray-600 flex-shrink-0" />
                       <div className="truncate">
-                        <h3 className="font-medium truncate">{music.title}</h3>
-                        <p className="text-sm text-muted-foreground truncate">{music.artist}</p>
+                        <h3 className="font-medium text-gray-900 truncate">{music.title}</h3>
+                        <p className="text-sm text-gray-500 truncate">{music.artist}</p>
                       </div>
                     </div>
                     <AlertDialog>
@@ -294,10 +295,10 @@ const Music = () => {
                           <Trash2 size={16} />
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent>
+                      <AlertDialogContent className="bg-white rounded-lg p-6 shadow-lg">
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
+                          <AlertDialogTitle className="text-lg font-semibold text-gray-900">Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription className="text-gray-600">
                             This action cannot be undone. This will permanently delete the music.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
@@ -305,7 +306,7 @@ const Music = () => {
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction 
                             onClick={() => handleDelete(music.id)}
-                            className="bg-red-500 hover:bg-red-600"
+                            className="bg-red-500 hover:bg-red-600 text-white"
                           >
                             Delete
                           </AlertDialogAction>
@@ -340,7 +341,7 @@ const Music = () => {
                 </PaginationItem>
               ))}
               <PaginationItem className="sm:hidden">
-                <span className="px-4 py-2">
+                <span className="px-4 py-2 text-gray-700">
                   Page {currentPage} of {totalPages}
                 </span>
               </PaginationItem>
@@ -357,8 +358,8 @@ const Music = () => {
           </Pagination>
         </>
       ) : (
-        <div className="bg-white rounded-lg border border-border p-6">
-          <p className="text-muted-foreground text-center">
+        <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
+          <p className="text-gray-600">
             {searchQuery ? "No music matches your search." : "No music added yet. Click the 'Add Music' button to get started."}
           </p>
         </div>

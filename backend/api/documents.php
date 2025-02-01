@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../auth.php';
+require_once __DIR__ . '/../config/database.php';
 
 // Add CORS headers
 header("Access-Control-Allow-Origin: http://localhost:8080");
@@ -22,14 +22,29 @@ try {
     $db = Database::getInstance();
     $pdo = $db->getConnection();
 
-    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        $stmt = $pdo->prepare('SELECT * FROM documents WHERE user_id = ? ORDER BY created_at DESC');
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && !isset($_GET['download'])) {
+        $stmt = $pdo->prepare("
+            SELECT id, title as name, file_type as type, file_path as url
+            FROM documents
+            WHERE user_id = ?
+            ORDER BY created_at DESC
+        ");
+        
         $stmt->execute([$userId]);
         $documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
+        if (!$documents) {
+            $documents = []; // Ensure it's an empty array if no documents found
+        }
+
+        // Transform the URLs to be fully qualified
+        foreach ($documents as &$doc) {
+            $doc['url'] = 'http://localhost:8888/backend/' . $doc['url'];
+        }
+
         echo json_encode([
             'status' => 'success',
-            'data' => $documents
+            'documents' => $documents
         ]);
         exit;
     }
@@ -157,8 +172,11 @@ try {
             echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
         }
     }
-} catch (Exception $e) {
-    error_log($e->getMessage());
+} catch (PDOException $e) {
+    error_log('Database error: ' . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Database error: ' . $e->getMessage()
+    ]);
 } 
