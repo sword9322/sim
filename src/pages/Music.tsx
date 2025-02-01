@@ -78,7 +78,7 @@ const Music = () => {
 
   const fetchMusic = async () => {
     try {
-      const response = await fetch('http://localhost:8888/backend/api/music.php', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/music.php`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -138,7 +138,7 @@ const Music = () => {
     formData.append('file', file);
     
     try {
-      const response = await fetch('http://localhost:8888/backend/api/music.php', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/music.php`, {
         method: 'POST',
         credentials: 'include',
         body: formData,
@@ -176,7 +176,7 @@ const Music = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:8888/backend/api/music.php?id=${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/music.php?id=${id}`, {
         method: 'DELETE',
         credentials: 'include',
       });

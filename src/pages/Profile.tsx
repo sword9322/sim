@@ -44,7 +44,7 @@ const Profile = () => {
     if (!isLoading) return; // Prevent fetching if already loaded
     
     try {
-      const response = await fetch('http://localhost:8888/backend/api/profile.php', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile.php`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -81,7 +81,7 @@ const Profile = () => {
     formData.append('profile_image', file);
 
     try {
-      const response = await fetch('http://localhost:8888/backend/api/profile.php', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile.php`, {
         method: 'POST',
         credentials: 'include',
         body: formData,
@@ -133,7 +133,7 @@ const Profile = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:8888/backend/api/profile.php', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

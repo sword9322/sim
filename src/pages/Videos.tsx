@@ -29,7 +29,7 @@ const Videos = () => {
 
   const fetchVideos = async () => {
     try {
-      const response = await fetch('http://localhost:8888/backend/api/videos.php', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/videos.php`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -74,7 +74,7 @@ const Videos = () => {
     formData.append('file', file);
     
     try {
-      const response = await fetch('http://localhost:8888/backend/api/videos.php', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/videos.php`, {
         method: 'POST',
         credentials: 'include',
         body: formData,
@@ -112,7 +112,7 @@ const Videos = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:8888/backend/api/videos.php?id=${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/videos.php?id=${id}`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -208,7 +208,7 @@ const Videos = () => {
                 <video 
                   controls 
                   className="w-full h-48 object-cover rounded-md mb-4"
-                  src={`http://localhost:8888/backend/uploads/videos/${video.file_path.split('/').pop()}`}
+                  src={`${import.meta.env.VITE_API_URL}/uploads/videos/${video.file_path.split('/').pop()}`}
                 >
                   Your browser does not support the video tag.
                 </video>

@@ -49,7 +49,7 @@ const Dashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('http://localhost:8888/backend/api/dashboard.php', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/dashboard.php`, {
         credentials: 'include'
       });
       const data = await response.json();
@@ -72,7 +72,7 @@ const Dashboard = () => {
 
   const fetchMusic = async () => {
     try {
-      const response = await fetch('http://localhost:8888/backend/api/music.php', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/music.php`, {
         credentials: 'include',
       });
       const data = await response.json();
@@ -84,7 +84,7 @@ const Dashboard = () => {
 
   const fetchVideos = async () => {
     try {
-      const response = await fetch('http://localhost:8888/backend/api/videos.php', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/videos.php`, {
         credentials: 'include',
       });
       const data = await response.json();
@@ -96,7 +96,7 @@ const Dashboard = () => {
 
   const fetchDocuments = async () => {
     try {
-      const response = await fetch('http://localhost:8888/backend/api/documents.php', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/documents.php`, {
         credentials: 'include',
       });
       const data = await response.json();

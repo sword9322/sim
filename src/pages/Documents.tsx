@@ -46,7 +46,7 @@ const Documents = () => {
 
   const fetchDocuments = async () => {
     try {
-      const response = await fetch('http://localhost:8888/backend/api/documents.php', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/documents.php`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -89,7 +89,7 @@ const Documents = () => {
     formData.append('file', file);
     
     try {
-      const response = await fetch('http://localhost:8888/backend/api/documents.php', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/documents.php`, {
         method: 'POST',
         credentials: 'include',
         body: formData,
@@ -121,7 +121,7 @@ const Documents = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:8888/backend/api/documents.php?id=${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/documents.php?id=${id}`, {
         method: 'DELETE',
         credentials: 'include',
       });
@@ -148,7 +148,7 @@ const Documents = () => {
 
   const handleDownload = async (id: number, name: string) => {
     try {
-      window.open(`http://localhost:8888/backend/api/documents.php?download=${id}`, '_blank');
+      window.open(`${import.meta.env.VITE_API_URL}/api/documents.php?download=${id}`, '_blank');
     } catch (error) {
       toast({
         title: "Error",

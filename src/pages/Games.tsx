@@ -35,7 +35,7 @@ const Games = () => {
 
   const fetchGames = async () => {
     try {
-      const response = await fetch('http://localhost:8888/backend/api/games.php', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/games.php`, {
         method: 'GET',
         credentials: 'include',
         headers: {
