@@ -1,37 +1,19 @@
 <?php
-class Database {
-    private static $instance = null;
-    private $connection = null;
+$db_host = getenv('MYSQL_HOST') ?: 'localhost';
+$db_user = getenv('MYSQL_USER') ?: 'root';
+$db_pass = getenv('MYSQL_PASSWORD') ?: '';
+$db_name = getenv('MYSQL_DATABASE') ?: 'your_database';
 
-    private function __construct() {
-        $host = 'localhost';
-        $dbname = 'mediahub';
-        $username = 'root';
-        $password = 'root';
-
-        try {
-            $this->connection = new PDO(
-                "mysql:host=$host;dbname=$dbname;charset=utf8mb4",
-                $username,
-                $password,
-                [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-                ]
-            );
-        } catch(PDOException $e) {
-            throw new Exception('Connection failed: ' . $e->getMessage());
-        }
-    }
-
-    public static function getInstance() {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
-
-    public function getConnection() {
-        return $this->connection;
-    }
+try {
+    $pdo = new PDO(
+        "mysql:host=$db_host;dbname=$db_name;charset=utf8mb4",
+        $db_user,
+        $db_pass,
+        [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+        ]
+    );
+} catch(PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
 } 
