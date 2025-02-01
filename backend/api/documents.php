@@ -39,7 +39,7 @@ try {
 
         // Transform the URLs to be fully qualified
         foreach ($documents as &$doc) {
-            $doc['url'] = 'http://localhost:8888/backend/' . $doc['url'];
+            $doc['url'] = 'https://sim-production-4718.up.railway.app/backend' . $doc['url'];
         }
 
         echo json_encode([

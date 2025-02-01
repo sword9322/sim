@@ -7,4 +7,10 @@ RewriteRule ^backend/api/profile\.php$ backend/api/profile.php [L]
 # Allow access to uploaded files
 <IfModule mod_rewrite.c>
     RewriteRule ^backend/uploads/ - [L]
-</IfModule> 
+</IfModule>
+
+SetEnvIf Origin "^https?://(.*\.)?sim-production-4718\.up\.railway\.app$" CORS_ALLOW_ORIGIN=$0
+Header set Access-Control-Allow-Origin %{CORS_ALLOW_ORIGIN}e env=CORS_ALLOW_ORIGIN
+Header set Access-Control-Allow-Credentials "true"
+Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header set Access-Control-Allow-Headers "Content-Type, X-Requested-With" 

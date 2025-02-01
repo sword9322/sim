@@ -15,7 +15,7 @@ $db = Database::getInstance();
 $pdo = $db->getConnection();
 
 // Set CORS headers
-header("Access-Control-Allow-Origin: http://localhost:8080");
+header("Access-Control-Allow-Origin: https://sim-production-4718.up.railway.app");
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Methods: POST, GET, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
