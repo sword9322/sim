@@ -1,0 +1,1 @@
+export const API_URL = 'https://sim-production-4718.up.railway.app/backend/api'; 
