@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { getApiUrl } from '@/config/api';
 
 interface User {
   id: number;
@@ -31,8 +32,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('http://localhost:8888/backend/api/auth.php', {
-        credentials: 'include'
+      const response = await fetch(`${getApiUrl()}/api/auth.php`, {
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        }
       });
       
       if (response.ok) {
@@ -58,11 +63,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch('http://localhost:8888/backend/api/auth.php', {
+      const response = await fetch(`${getApiUrl()}/api/auth.php`, {
         method: 'POST',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify({
           action: 'login',

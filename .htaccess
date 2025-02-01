@@ -1,16 +1,36 @@
+# CORS Headers
+# Remove or comment out these lines to avoid conflicts
+# Header set Access-Control-Allow-Origin "*"
+# Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+# Header set Access-Control-Allow-Headers "Content-Type"
+
+SetEnvIf Origin "^https?://(.+\.)?(localhost:8080|sim-production-4718\.up\.railway\.app)$" CORS_ALLOW_ORIGIN=$0
+Header set Access-Control-Allow-Origin %{CORS_ALLOW_ORIGIN}e env=CORS_ALLOW_ORIGIN
+Header set Access-Control-Allow-Credentials "true"
+Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+Header set Access-Control-Allow-Headers "Content-Type, X-Requested-With"
+
+# Handle OPTIONS preflight requests
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ $1 [R=200,L]
+
+# Your existing rules
 RewriteRule ^api/profile/upload-image$ api/profile.php [L]
 RewriteRule ^api/profile/update$ api/profile.php [L]
-
-# Profile endpoints
 RewriteRule ^backend/api/profile\.php$ backend/api/profile.php [L]
 
 # Allow access to uploaded files
 <IfModule mod_rewrite.c>
     RewriteRule ^backend/uploads/ - [L]
-</IfModule>
+</IfModule> 
 
-SetEnvIf Origin "^https?://(.*\.)?sim-production-4718\.up\.railway\.app$" CORS_ALLOW_ORIGIN=$0
-Header set Access-Control-Allow-Origin %{CORS_ALLOW_ORIGIN}e env=CORS_ALLOW_ORIGIN
-Header set Access-Control-Allow-Credentials "true"
-Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-Header set Access-Control-Allow-Headers "Content-Type, X-Requested-With" 
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+php_value upload_max_filesize 64M
+php_value post_max_size 64M
+php_value memory_limit 256M
+php_value max_execution_time 300
+php_value max_input_time 300
