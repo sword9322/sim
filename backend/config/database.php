@@ -1,19 +1,36 @@
 <?php
-$db_host = getenv('MYSQL_HOST') ?: 'localhost';
-$db_user = getenv('MYSQL_USER') ?: 'root';
-$db_pass = getenv('MYSQL_PASSWORD') ?: '';
-$db_name = getenv('MYSQL_DATABASE') ?: 'your_database';
+class Database {
+    private static $instance = null;
+    private $conn;
 
-try {
-    $pdo = new PDO(
-        "mysql:host=$db_host;dbname=$db_name;charset=utf8mb4",
-        $db_user,
-        $db_pass,
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-        ]
-    );
-} catch(PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
+    private function __construct() {
+        $host = 'viaduct.proxy.rlwy.net';
+        $port = '38872';
+        $db   = 'railway';
+        $user = 'root';
+        $pass = 'etRHLLTUuQuemQTulOwxrnzINDilXHQx';
+
+        try {
+            $this->conn = new PDO(
+                "mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4",
+                $user,
+                $pass,
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+            );
+        } catch(PDOException $e) {
+            error_log("Connection failed: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public static function getInstance() {
+        if (self::$instance == null) {
+            self::$instance = new Database();
+        }
+        return self::$instance;
+    }
+
+    public function getConnection() {
+        return $this->conn;
+    }
 } 
