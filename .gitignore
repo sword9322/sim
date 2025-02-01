@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Add these to your .gitignore
+uploads/
+*.mp4
+*.mov
+*.wav
+*.mp3
+dist/
+node_modules/
