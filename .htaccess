@@ -4,11 +4,11 @@
 # Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
 # Header set Access-Control-Allow-Headers "Content-Type"
 
-SetEnvIf Origin "^https?://(.+\.)?(localhost:8080|sim-production-4718\.up\.railway\.app)$" CORS_ALLOW_ORIGIN=$0
+SetEnvIf Origin "^https?://(localhost:5173|sim-production-4718\.up\.railway\.app)$" CORS_ALLOW_ORIGIN=$0
 Header set Access-Control-Allow-Origin %{CORS_ALLOW_ORIGIN}e env=CORS_ALLOW_ORIGIN
 Header set Access-Control-Allow-Credentials "true"
 Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-Header set Access-Control-Allow-Headers "Content-Type, X-Requested-With"
+Header set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
 
 # Handle OPTIONS preflight requests
 RewriteCond %{REQUEST_METHOD} OPTIONS

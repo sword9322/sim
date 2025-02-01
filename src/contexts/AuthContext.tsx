@@ -100,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = async (email: string, password: string) => {
     try {
-      const response = await fetch('http://localhost:8888/backend/api/auth.php', {
+      const response = await fetch(`${getApiUrl()}/api/auth.php`, {
         method: 'POST',
         credentials: 'include',
         headers: {
