@@ -8,6 +8,9 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
+  preview: {
+    allowedHosts: ["sim-8k4g.onrender.com"],
+  },
   plugins: [react()],
   resolve: {
     alias: {
